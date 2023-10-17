@@ -186,7 +186,7 @@ should return [false, true].
 
 def map_not : List Bool → List Bool 
 | [] => []
-| h::t => _   -- hint: use :: to construct answer
+| h::t => not h::map_not t   -- hint: use :: to construct answer
 
 -- test cases
 #eval map_not []              -- exect []
@@ -202,7 +202,9 @@ of all the natural numbers from *n* to *0*, inclusive.
 
 -- Your answer here
 
-
+def countdown : Nat → List Nat
+| 0 => [0]
+| n' + 1 => (n'+1)::countdown n'
 
 -- test cases
 #eval countdown 0            -- expect [0]
@@ -223,9 +225,9 @@ this function as an analog of natural number addition.
 
 -- Here
 
-def concat {α : Type} : _
-| [], m => _
-| _, _ =>  _
+def concat {α : Type} : List α → List α → List α
+| [], m => m
+| h::t, m =>  h::concat t m
 
 -- Test cases
 
@@ -243,6 +245,9 @@ just that one element.
 
 -- Here
 
+def pure' {alpha: Type} : alpha -> List alpha
+|a => [a]
+
 #eval pure' "Hi"       -- expect ["Hi"]
 
 /-!
@@ -256,9 +261,13 @@ list on the right. Instead, consider using *concat*.
 
 -- Answer here:
 
+def list_rev {alpha : Type}: List alpha -> List alpha
+|h::t => 
+
 
 /-!
 ## Part 2: Propositional Logic: Syntax and Semantics
 
 Forthcoming as an update to this file.
 -/
+

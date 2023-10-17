@@ -91,7 +91,7 @@ ordered pair notation to match the input value.
 -- Here 
 
 def prod_assoc { α β γ : Type} :  α × (β × γ) → (α × β) × γ
-| _ => _
+| (a, (b, c)) => ((a, b), c)
 
 /-!
 Prove that the conversion works in the reverse direction
@@ -100,6 +100,9 @@ a function, *prod_assoc_reverse* accordingly.
 -/
 
 -- Here:
+
+def prod_assoc_reverse { α β γ : Type} : (α × β) × γ →α × (β × γ)
+| ((a, b), c) => (a, (b, c))
 
 /-!
 ## #4. Is Sum Commutative?
@@ -134,8 +137,8 @@ of definition.
 def sum_comm { α β : Type} : α ⊕ β → β ⊕ α :=
 fun s => 
   match s with
-  | _ => _
-  | _ => _
+  | Sum.inl a => Sum.inr a
+  | Sum.inr b => Sum.inl b
 
 /-!
 Can you always convert a term of type *β ⊗ α* into 
@@ -144,6 +147,12 @@ that does it. Call is sum_comm_reverse.
 -/
 
 -- Here:
+
+def sum_comm_reverse { α β : Type} : β ⊕ α → α ⊕ β :=
+fun s => 
+  match s with
+  | Sum.inl b => Sum.inr b
+  | Sum.inr a => Sum.inl a
 
 
 /-!
@@ -172,9 +181,10 @@ in both matching and to define return result values.
 -/
 
 def sum_assoc { α β γ : Type} : α ⊕ (β ⊕ γ) → (α ⊕ β) ⊕ γ
-| (Sum.inl a) => (Sum.inl _)
-| (Sum.inr (Sum.inl b)) => _
-| _ => _
+| (Sum.inl a) => (Sum.inl (Sum.inl a))
+| (Sum.inr (Sum.inl b)) => (Sum.inl (Sum.inr b))
+| (Sum.inr (Sum.inr g)) => (Sum.inr g)
+
 
 /-!
 Does this conversion also work in reverse? Prove it
@@ -184,6 +194,12 @@ a value of the first sum type as a result.
 -/
 
 -- Here:
+
+def sum_assoc_reverse { α β γ : Type} : (α ⊕ β) ⊕ γ → α ⊕ (β ⊕ γ)
+| (Sum.inl b) => (Sum.inl (Sum.inl b))
+| (Sum.inr (Sum.inl g)) => (Sum.inl (Sum.inr g))
+| (Sum.inr (Sum.inr a)) => (Sum.inr a)
+
 
 /-!
 ## #6. Products Distribute Over Sums
@@ -200,9 +216,11 @@ either an *α* value and a *β* value, or an *α* value and
 a *γ* value. 
  -/
 
- def prod_dist_sum {α β γ : Type} : _
- | _ => _
- | _ => _
+def prod_dist_sum {α β γ : Type} : α × (β ⊕ γ) → (α × β) ⊕ (α × γ) :=
+fun ⟨a, s⟩ =>
+   match s with
+  | Sum.inl b => Sum.inl (a, b)
+  | Sum.inr c => Sum.inr (a, c)
 
 /-!
 Does the preceding principle work in reverse? In other 
@@ -215,6 +233,11 @@ any value of type *(α × β) ⊕ (α × γ)* into one of type
 -/
 
 -- Here:
+
+def prod_dist_sum_reverse {α β γ : Type} : (α × β) ⊕ (α × γ) → α × (β ⊕ γ) :=
+fun s => match s with
+  | Sum.inl ⟨a, b⟩ => ⟨a, Sum.inl b⟩
+  | Sum.inr ⟨a, c⟩ => ⟨a, Sum.inr c⟩
  
 /-!
 In the forward (first) direction we can say that products
@@ -238,6 +261,11 @@ type *wet*.
 
 -- Here
 
+def its_wet (rs : rain ⊕ sprinkler) (rainToWet : rain → wet) (sprinklerToWet : sprinkler → wet) : wet :=
+match rs with
+  | Sum.inl r => rainToWet r
+  | Sum.inr s => sprinklerToWet s
+
 /-!
 Now rewrite your function using the type names,
 *α, γ,* and *β* instead of *rain, sprinkler* and
@@ -246,6 +274,10 @@ Now rewrite your function using the type names,
 
 -- Here:
 
+def sum_elim {α β γ : Type} (rs : α ⊕ β) (fα : α → γ) (fβ : β → γ) : γ :=
+match rs with
+  | Sum.inl a => fα a
+  | Sum.inr b => fβ b
 /-!
 You should now better understand how to program 
 with arbitrary values of arbitrary sum types. To do 
